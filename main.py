@@ -1,8 +1,7 @@
 import streamlit as st
 import requests
-import os
 
-token = os.getenv('STREAMLIT_TOKEN')
+token = st.secrets["STREAMLIT_TOKEN"]
 
 API_URL_dict = {
     "Bag of words": "",
