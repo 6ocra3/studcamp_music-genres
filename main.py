@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import requests
-
+import tflr
 st.set_page_config(page_title="Two model inference")
 
 token = st.secrets["STREAMLIT_TOKEN"]
@@ -20,7 +19,7 @@ css = """
 st.markdown(css, unsafe_allow_html=True)
 
 API_URL_dict = {
-    "Bag of words": "",
+    "tf-idf+logreg": tflr.predict,
     "World2Vec": "",
     "TF-IDF": "",
 }
@@ -30,8 +29,9 @@ headers = {"Authorization": f"Bearer {token}"}
 
 def query(model, data):
     if API_URL_dict[model]:
-        response = requests.post(API_URL_dict[model], headers=headers, data=data)
-        return response.json()
+        return API_URL_dict[model](data)[0]
+        # response = requests.post(API_URL_dict[model], headers=headers, data=data)
+        # return response.json()
     else:
         return "in progress"
 
@@ -56,7 +56,7 @@ def inference(model, lyrics):
 
 
 def show_main_page():
-
+    tflr.init()
     st.markdown(css, unsafe_allow_html=True)
 
     start_year = 2015
