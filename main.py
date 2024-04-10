@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import tflr
 import seaborn as sns
+import requests
 
 st.set_page_config(page_title="Two model inference")
 token = st.secrets["STREAMLIT_TOKEN"]
@@ -28,7 +28,7 @@ css = """
 st.markdown(css, unsafe_allow_html=True)
 
 API_URL_dict = {
-    "tf-idf+logreg": tflr.predict,
+    "tf-idf+logreg": "http://84.252.140.202:8080/process-text/",
     "World2Vec": "",
     "TF-IDF": "",
 }
@@ -38,9 +38,9 @@ headers = {"Authorization": f"Bearer {token}"}
 
 def query(model, data):
     if API_URL_dict[model]:
-        return API_URL_dict[model](data)[0]
-        # response = requests.post(API_URL_dict[model], headers=headers, data=data)
-        # return response.json()
+        json_data = {"text": data}
+        response = requests.post(API_URL_dict[model], headers=headers, json=json_data)
+        return response.json()
     else:
         return "in progress"
 
@@ -61,7 +61,7 @@ def inference(model, lyrics):
     if lyrics:
         output = predict(model, lyrics)
         st.header("Распознанный жанр:")
-        st.subheader(output)
+        st.subheader(output[0])
 
 def genres_by_year(year):
     df = pd.read_csv('songs_by_year_and_genre.csv')
@@ -146,8 +146,6 @@ def page_model_inference():
 
 # Функция main теперь отвечает за управление навигацией
 def main():
-    tflr.init()
-
     st.sidebar.title("Навигация")
     page = st.sidebar.radio("Выберите страницу:", ["Визуализации", "Распознавание жанра"])
 
