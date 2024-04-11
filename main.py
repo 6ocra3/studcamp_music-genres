@@ -28,9 +28,7 @@ css = """
 st.markdown(css, unsafe_allow_html=True)
 
 API_URL_dict = {
-    "tf-idf+logreg": "http://84.252.140.202:8080/process-text/",
-    "World2Vec": "",
-    "TF-IDF": "",
+    "6 Классификаторов": "http://158.160.1.195:8000/process-text/",
 }
 
 headers = {"Authorization": f"Bearer {token}"}
@@ -62,6 +60,8 @@ def inference(model, lyrics):
         output = predict(model, lyrics)
         st.header("Распознанный жанр:")
         st.subheader(output[0])
+        strings = " ".join(output[1:])
+        st.text(strings)
 
 def genres_by_year(year):
     df = pd.read_csv('songs_by_year_and_genre.csv')
