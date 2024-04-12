@@ -3,7 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import requests
-
+import mocks
+output = ""
 st.set_page_config(page_title="Two model inference")
 token = st.secrets["STREAMLIT_TOKEN"]
 
@@ -31,13 +32,11 @@ API_URL_dict = {
     "6 Классификаторов": "http://158.160.1.195:8000/process-text/",
 }
 
-headers = {"Authorization": f"Bearer {token}"}
-
 
 def query(model, data):
     if API_URL_dict[model]:
         json_data = {"text": data}
-        response = requests.post(API_URL_dict[model], headers=headers, json=json_data)
+        response = requests.post(API_URL_dict[model], json=json_data)
         return response.json()
     else:
         return "in progress"
@@ -56,12 +55,16 @@ def predict(model, data):
 
 
 def inference(model, lyrics):
+    global output
+    print(lyrics)
     if lyrics:
         output = predict(model, lyrics)
         st.header("Распознанный жанр:")
         st.subheader(output[0])
-        strings = " ".join(output[1:])
-        st.text(strings)
+        if (output[1:]):
+            strings = " ".join(output[1:])
+            st.text(strings)
+
 
 def genres_by_year(year):
     df = pd.read_csv('songs_by_year_and_genre.csv')
@@ -111,7 +114,6 @@ def heatmap():
     ax.set_xlabel('Жанры', size=13, color='white')
     ax.set_ylabel('Жанры', size=13, color='white')
 
-
     ax.tick_params(colors='white', size=13, which='both')
 
     cbar1 = ax.collections[0].colorbar
@@ -135,24 +137,49 @@ def page_visualizations():
 
     heatmap()
 
+
+def report(lyrics, genre):
+    json_data = {"lyrics": lyrics,
+                 "genre": genre}
+    response = requests.post("http://127.0.0.1:8000/report/", json=json_data)
+
+
 def page_model_inference():
     """Страница с селектором модели и вводом текста."""
-    st.title("Распознование жанра песни")
+    global output
 
-    model = input_features()
-    st.header("Введите текст:")
-    lyrics = st.text_area("Текст песни", height=400, label_visibility="hidden")
+    st.header("Распознование жанра песни")
+    st.title("Введите текст:")
+    keys = [""]
+    keys += list(mocks.songs.keys())
+    text_to_insert = st.selectbox("Песни для примера:", keys)
+    mock = mocks.songs
+    mock[""] = ""
+
+    model = "6 Классификаторов"
+    lyrics = st.text_area("Текст песни", height=400, label_visibility="hidden", value=mock[text_to_insert])
+
+
+
     inference(model, lyrics)
 
-# Функция main теперь отвечает за управление навигацией
+    st.title("")
+
+    if output:
+        st.text("Если мы ошиблись, то укажите нужный жанр")
+        genre = st.selectbox("Выберите правильный жанр:", ["rap", "rb", "pop", "rock", "country"])
+        button_clicked = st.button("Отправить нужный жанр", on_click=lambda: report(lyrics, genre))
+
+
 def main():
     st.sidebar.title("Навигация")
-    page = st.sidebar.radio("Выберите страницу:", ["Визуализации", "Распознавание жанра"])
+    page = st.sidebar.radio("Выберите страницу:", ["Распознавание жанра", "Визуализации"])
 
     if page == "Визуализации":
         page_visualizations()
     elif page == "Распознавание жанра":
         page_model_inference()
+
 
 if __name__ == "__main__":
     main()
