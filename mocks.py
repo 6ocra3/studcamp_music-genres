@@ -1,5 +1,4 @@
-song_lyrics = """
-[Verse 1]
+song_lyrics = """[Verse 1]
 It's not true
 Tell me I’ve been lied to
 Crying isn't like you, ooh
