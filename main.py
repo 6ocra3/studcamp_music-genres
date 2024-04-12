@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import requests
 import mocks
+
 output = ""
 st.set_page_config(page_title="Two model inference")
 token = st.secrets["STREAMLIT_TOKEN"]
@@ -141,7 +142,7 @@ def page_visualizations():
 def report(lyrics, genre):
     json_data = {"lyrics": lyrics,
                  "genre": genre}
-    response = requests.post("http://127.0.0.1:8000/report/", json=json_data)
+    response = requests.post("http://158.160.1.195:8000/report/", json=json_data)
 
 
 def page_model_inference():
@@ -158,8 +159,6 @@ def page_model_inference():
 
     model = "6 Классификаторов"
     lyrics = st.text_area("Текст песни", height=400, label_visibility="hidden", value=mock[text_to_insert])
-
-
 
     inference(model, lyrics)
 
