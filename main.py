@@ -30,7 +30,7 @@ css = """
 st.markdown(css, unsafe_allow_html=True)
 
 API_URL_dict = {
-    "6 Классификаторов": "http://158.160.1.195:8000/process-text/",
+    "6 Классификаторов": "http://51.250.111.183:8000/process-text/",
 }
 
 
@@ -142,7 +142,7 @@ def page_visualizations():
 def report(lyrics, genre):
     json_data = {"lyrics": lyrics,
                  "genre": genre}
-    response = requests.post("http://158.160.1.195:8000/report/", json=json_data)
+    response = requests.post("http://51.250.111.183:8000/report/", json=json_data)
 
 
 def page_model_inference():
